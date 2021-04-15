@@ -1,0 +1,11 @@
+!- Cat(x) => Animal(x)
+!- Dog(x) => Animal(x)
+!- Cat(Tuna)
+!- Dog(D)
+!- Owns(Jack,D)
+!- Animal(y) & Owns(x,y) => AnimalLover(x)
+!- ~(AnimalLover(x) & Animal(y) & Kills(x,y))
+!- Kills(Jack, Tuna) | Kills(Curiosity, Tuna)
+
+# Did someone kill Tuna?
+?- Kills(x, Tuna)

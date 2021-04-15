@@ -1,0 +1,9 @@
+?- Ancestor(Liz,Billy)
+?- Ancestor(Liz,Bob)
+
+!- Mother(Liz,Charley)
+!- Father(Charley,Billy)
+!- Mother(x,y) => Parent(x, y)
+!- Father(x,y) => Parent(x, y)
+!- Parent(x,y) => Ancestor(x, y)
+!- Parent(x,y) & Ancestor(y,z) => Ancestor(x,z)
