@@ -62,13 +62,13 @@ using std::endl;
 
 class Knowledgebase {
 private:
-	//Define maximum amount of time for each query in seconds
+	// Define maximum amount of time for each query in seconds
 	long maxQueryTime = 10;
 
-	//Define meaning of argument
+	// Define meaning of argument
 	typedef vector<string> argumentList;
 
-	//Define meaning of predicate
+	// Define meaning of predicate
 	struct predicate {
 		bool negated;
 		string name;
@@ -130,10 +130,10 @@ private:
 		}
 	};
 
-	//Define meaning of sentence
+	// Define meaning of sentence
 	typedef vector<predicate> sentence;
 
-	//Define hash function for predicates
+	// Define hash function for predicates
 	struct hash_predicate {
 		size_t operator()(predicate const& p) const {
 			size_t signature = 17;
@@ -147,11 +147,11 @@ private:
 		}
 	};
 
-	//Define hash function for sentences
+	// Define hash function for sentences
 	struct hash_sentence {
 		size_t operator()(sentence const& s) const {
-			//Variable rewriting is used to equalize the sentences
-			//After rewriting the order of the variables in the predicates matters and not the variable names
+			// Variable rewriting is used to equalize the sentences
+			// After rewriting the order of the variables in the predicates matters and not the variable names
 			int variable_count = 0;
 			unordered_map<string, int> visited_variables;
 
@@ -163,8 +163,8 @@ private:
 				for (size_t j = 0; j < s[i].args.size(); j++) {
 					if (isVariable(s[i].args[j])) {
 						if (visited_variables.count(s[i].args[j]) == 0) {
-							//If variable hasn't been visited before
-							//Add to visited_variables
+							// If variable hasn't been visited before
+							// Add to visited_variables
 							variable_count++;
 							visited_variables[s[i].args[j]] = variable_count;
 						}
@@ -182,7 +182,7 @@ private:
 		}
 	};
 
-	//Helper functions and classes
+	// Helper functions and classes
 	static bool isVariable(const string_view x) {
 		return islower(x[0]);
 	}
@@ -291,24 +291,6 @@ private:
 			return result.top();
 		}
 
-		vector<string> createExpressionList(node* root) {
-			vector<string> result, temp;
-			if (root == nullptr)
-				return result;
-
-			temp = createExpressionList(root->left);
-			if (!temp.empty())
-				result.insert(result.end(), temp.begin(), temp.end());
-
-			result.push_back(root->data);
-
-			temp = createExpressionList(root->right);
-			if (!temp.empty())
-				result.insert(result.end(), temp.begin(), temp.end());
-
-			return result;
-		}
-
 		static void deleteExpressionTree(node* root) {
 			if (root == nullptr)
 				return;
@@ -363,32 +345,32 @@ private:
 		}
 
 		static void addToStack(const string_view op, stack<node*>& operandStack) {
-			//create node for the operator or operand
+			// create node for the operator or operand
 			node* root = new node;
 			root->data = op;
 
 			if (isOperator(op)) {
-				//if node is an operator process the operator based on unary or binary operation
+				// if node is an operator process the operator based on unary or binary operation
 				if (op == "~") {
-					//get node for the operand
+					// get node for the operand
 					node* operand = operandStack.top();
 					operand->parent = root;
-					//pop the operand stack
+					// pop the operand stack
 					operandStack.pop();
-					//assign the operand to the left of the root operator
+					// assign the operand to the left of the root operator
 					root->left = operand;
 					root->right = nullptr;
 				}
 				else {
-					//get node for second operand
+					// get node for second operand
 					node* operand2 = operandStack.top();
 					operand2->parent = root;
 					operandStack.pop();
-					//get node for first operand
+					// get node for first operand
 					node* operand1 = operandStack.top();
 					operand1->parent = root;
 					operandStack.pop();
-					//assign the operand to the left and right of the root operator
+					// assign the operand to the left and right of the root operator
 					root->left = operand1;
 					root->right = operand2;
 				}
@@ -402,39 +384,39 @@ private:
 				return nullptr;
 
 			if (root->left == nullptr && root->right == nullptr) {
-				//If leaf node is encountered i.e operand encountered
+				// If leaf node is encountered i.e operand encountered
 				if (root->data[0] != '~') {
-					//premise is positive
+					// premise is positive
 					root->data = "~" + root->data;
 				}
 				else {
-					//premise is negative
+					// premise is negative
 					root->data = root->data.substr(1);
 				}
 			}
 			else {
-				//operator encountered
+				// operator encountered
 				if (root->data == "~") {
-					//If a "~" operator node is encountered
+					// If a "~" operator node is encountered
 					node* t = root;
 					if (root->parent == nullptr) {
-						//if root doesnt have a parent then make child the root
+						// if root doesnt have a parent then make child the root
 						root = root->left;
 						root->parent = nullptr;
 					}
 					else {
 						if (root->parent->left == root) {
-							//if "~" is on the left side of parent
+							// if "~" is on the left side of parent
 							root->parent->left = root->left;
 						}
 						else {
-							//if "~" is on the right side of parent
+							// if "~" is on the right side of parent
 							root->parent->right = root->left;
 						}
-						//make the roots parent, the child's parent
+						// make the roots parent, the child's parent
 						root->left->parent = root->parent;
 						root = root->left;
-						//delete the "~" node
+						// delete the "~" node
 					}
 					delete t;
 					return root;
@@ -460,7 +442,7 @@ private:
 			removeImplications(root->left);
 			removeImplications(root->right);
 			if (root->data == "=>") {
-				//A => B ------> ~A | B
+				// A => B ------> ~A | B
 				negate(root->left);
 				root->data = "|";
 			}
@@ -471,8 +453,8 @@ private:
 				return nullptr;
 
 			while (root->data == "~") {
-				root = negate(root); //removes the "~" sign only
-				root = negate(root); //performs the actual negation
+				root = negate(root); // removes the "~" sign only
+				root = negate(root); // performs the actual negation
 			}
 
 			root->left = resolveNegations(root->left);
@@ -487,24 +469,24 @@ private:
 			bool isParentLeftOfGrandparent = (grandparent != nullptr) ? (grandparent->left == parent) : false;
 
 			if (parent->left == child) {
-				//if child is the left child of the parent
+				// if child is the left child of the parent
 				leftBranch1 = child->left;
 				leftBranch2 = child->right;
 				rightBranch1 = parent->right;
 				rightBranch2 = deepCopy(parent->right);
 			}
 			else {
-				//If child is the right child of the parent
+				// If child is the right child of the parent
 				leftBranch1 = parent->left;
 				leftBranch2 = deepCopy(parent->left);
 				rightBranch1 = child->left;
 				rightBranch2 = child->right;
 			}
 
-			//delete parent
+			// delete parent
 			delete parent;
 
-			//create and initialize new left and right parent
+			// create and initialize new left and right parent
 			node* leftNode = new node;
 			leftNode->data = "|";
 			leftNode->left = leftBranch1;
@@ -517,22 +499,22 @@ private:
 			rightNode->right = rightBranch2;
 			rightNode->parent = child;
 
-			//Make left node parent of *branch1
+			// Make left node parent of *branch1
 			leftBranch1->parent = leftNode;
 			rightBranch1->parent = leftNode;
 
-			//Make right node parent of *branch2
+			// Make right node parent of *branch2
 			leftBranch2->parent = rightNode;
 			rightBranch2->parent = rightNode;
 
-			//Make child point to new left and right nodes
+			// Make child point to new left and right nodes
 			child->left = leftNode;
 			child->right = rightNode;
 
-			//Make child grandparents child
+			// Make child grandparents child
 			child->parent = grandparent;
 			if (grandparent != nullptr) {
-				//If child has a grandparent
+				// If child has a grandparent
 				if (isParentLeftOfGrandparent) {
 					grandparent->left = child;
 				}
@@ -548,41 +530,41 @@ private:
 			if (root == nullptr)
 				return nullptr;
 
-			//If root is an operand, return without modification
+			// If root is an operand, return without modification
 			if (!isOperator(root->data))
 				return root;
 
-			//If root is "|"...
+			// If root is "|"...
 			if (root->data == "|") {
 				bool distributed = false;
-				//...and its left child is "&"
+				// ...and its left child is "&"
 				if (root->left->data == "&") {
-					//distribute | over & on the left child
+					// distribute | over & on the left child
 					root = distribute(root, root->left);
 					distributed = true;
 				}
 
-				//...and its right child is "&"
+				// ...and its right child is "&"
 				if (root->right->data == "&") {
-					//distribute | over & on the right child
+					// distribute | over & on the right child
 					root = distribute(root, root->right);
 					distributed = true;
 				}
 
-				//If distribution has taken place
+				// If distribution has taken place
 				if (distributed) {
 					if (root->parent == nullptr) {
-						//If root is the absolute root of the tree, test children for possible distributions
+						// If root is the absolute root of the tree, test children for possible distributions
 						return distributeOrOverAnd(root);
 					}
 					else {
-						//Bubble up the control flow
+						// Bubble up the control flow
 						return root;
 					}
 				}
 			}
 
-			//Store original left and right children
+			// Store original left and right children
 			node* left = root->left;
 			node* right = root->right;
 			/*
@@ -591,12 +573,12 @@ private:
 			 */
 			root->left = distributeOrOverAnd(root->left);
 			if (left != root->left) {
-				//If left child changes then return the result of rerunning over root
+				// If left child changes then return the result of rerunning over root
 				return distributeOrOverAnd(root);
 			}
 			root->right = distributeOrOverAnd(root->right);
 			if (right != root->right) {
-				//If right child changes then return the result of rerunning over root
+				// If right child changes then return the result of rerunning over root
 				return distributeOrOverAnd(root);
 			}
 
@@ -653,29 +635,29 @@ private:
 		}
 
 		static void factorize(sentence& s) {
-			//Removes duplicate predicates
+			// Removes duplicate predicates
 			unordered_set<predicate, hash_predicate> predicates(s.begin(), s.end());
 			s.assign(predicates.begin(), predicates.end());
 		}
 
 		static vector<sentence> convertToCNFSentences(const string_view s) {
-			//Create expression tree from tokenized string
+			// Create expression tree from tokenized string
 			node* expressionRoot = createExpressionTree(tokenize(s));
-			//cout << "Tokenized Expression \t\t:\t " << createExpressionString(expressionRoot) << endl;
+			// cout << "Tokenized Expression \t\t:\t " << createExpressionString(expressionRoot) << endl;
 
-			//Remove implications
+			// Remove implications
 			removeImplications(expressionRoot);
-			//cout << "Expression without Implications :\t " << createExpressionString(expressionRoot) << endl;
+			// cout << "Expression without Implications :\t " << createExpressionString(expressionRoot) << endl;
 
-			//Resolve negations
+			// Resolve negations
 			expressionRoot = resolveNegations(expressionRoot);
-			//cout << "Expression without Negations \t:\t " << createExpressionString(expressionRoot) << endl;
+			// cout << "Expression without Negations \t:\t " << createExpressionString(expressionRoot) << endl;
 
-			//Distribute | over &
+			// Distribute | over &
 			expressionRoot = distributeOrOverAnd(expressionRoot);
-			//cout << "After Distribution of | over & \t:\t " << createExpressionString(expressionRoot) << endl;
+			// cout << "After Distribution of | over & \t:\t " << createExpressionString(expressionRoot) << endl;
 
-			//Split sentences over &
+			// Split sentences over &
 			vector<node*> sentences = splitSentenceOverAnd(expressionRoot);
 			/*
 			cout << "New Sentences in CNF" << endl;
@@ -685,23 +667,23 @@ private:
 			sentence temp;
 			vector<sentence> result;
 			for (size_t i = 0; i < sentences.size(); i++) {
-				//Convert to CNF sentence
+				// Convert to CNF sentence
 				temp = createCNFSentence(sentences[i]);
-				//Factorize the CNF sentence
-				//Removes redundant predicates
-				//A(x) | A(x) becomes A(x)
+				// Factorize the CNF sentence
+				// Removes redundant predicates
+				// A(x) | A(x) becomes A(x)
 				factorize(temp);
-				//Add to result
+				// Add to result
 				result.emplace_back(temp);
 			}
 
-			//Delete the expression tree
+			// Delete the expression tree
 			deleteExpressionTree(expressionRoot);
 			return result;
 		}
 	};
 
-	//Define Database class
+	// Define Database class
 	class Database {
 	private:
 		struct row {
@@ -711,38 +693,38 @@ private:
 			vector<pair<size_t, size_t>> negative_sentences;
 		};
 
-		unordered_map<char, size_t> variables; //Used for standardization
+		unordered_map<char, size_t> variables; // Used for standardization
 
-		vector<sentence> data;  //Contains all sentences
-		unordered_map<string, row> index; //Contains index about all sentences
+		vector<sentence> data;  // Contains all sentences
+		unordered_map<string, row> index; // Contains index about all sentences
 
 		sentence standardizeVariables(sentence& s) {
 			unordered_set<char> current_variables;
-			//Iterate through all predicates of the sentence
+			// Iterate through all predicates of the sentence
 			for (size_t i = 0; i < s.size(); i++) {
 				argumentList& args = s[i].args;
-				//Iterate through all arguments of the predicate
+				// Iterate through all arguments of the predicate
 				for (size_t j = 0; j < args.size(); j++) {
 					if (isVariable(args[j])) {
-						//If argument is a variable then standardize
+						// If argument is a variable then standardize
 						char var = args[j][0];
 						if (current_variables.count(var) == 0) {
-							//If variable hasn't been seen in the sentence previously
+							// If variable hasn't been seen in the sentence previously
 							if (variables.count(var) == 0) {
-								//If variable hasn't been seen in the KB previously
-								//Initialize the variable's unique count
+								// If variable hasn't been seen in the KB previously
+								// Initialize the variable's unique count
 								variables[var] = 1;
 
 							}
 							else {
-								//If variable has been seen in the KB previously
-								//Increment the variable's unique count
+								// If variable has been seen in the KB previously
+								// Increment the variable's unique count
 								variables[var]++;
 							}
-							//insert the variable in the current variable set
+							// insert the variable in the current variable set
 							current_variables.insert(var);
 						}
-						//Append unique id
+						// Append unique id
 						args[j] = var + std::to_string(variables[var]);
 					}
 				}
@@ -760,13 +742,13 @@ private:
 		}
 
 		void store(sentence& s) {
-			//Standardize the CNF sentence
+			// Standardize the CNF sentence
 			s = standardizeVariables(s);
 			data.emplace_back(s);
 
-			//Loop through all predicates in the sentence
+			// Loop through all predicates in the sentence
 			for (size_t i = 0; i < s.size(); i++) {
-				//Index the predicate
+				// Index the predicate
 				if (isLiteral(s[i])) {
 					if (!s[i].negated) {
 						index[s[i].name].positive_literals.emplace_back(pair<size_t, size_t>(data.size() - 1, i));
@@ -799,11 +781,11 @@ private:
 				literalIndex = index[p.name].negative_literals;
 				sentenceIndex = index[p.name].negative_sentences;
 			}
-			//Fetch all literals and add to result
+			// Fetch all literals and add to result
 			for (size_t i = 0; i < literalIndex.size(); i++) {
 				result.emplace_back(pair<sentence, size_t>(data[literalIndex[i].first], literalIndex[i].second));
 			}
-			//Fetch all non literals and add to result
+			// Fetch all non literals and add to result
 			for (size_t i = 0; i < sentenceIndex.size(); i++) {
 				result.emplace_back(pair<sentence, size_t>(data[sentenceIndex[i].first], sentenceIndex[i].second));
 			}
@@ -813,21 +795,21 @@ private:
 
 	};
 
-	//Create a global database for sentences in the knowledge base
+	// Create a global database for sentences in the knowledge base
 	Database DB;
 
-	//Substitutes argumentList with substitution list theta
+	// Substitutes argumentList with substitution list theta
 	argumentList& substitute(argumentList& x, unordered_map<string, string>& theta) {
-		//Loop through all arguments
+		// Loop through all arguments
 		for (size_t i = 0; i < x.size(); i++) {
-			//Check if argument is substitutable using theta
+			// Check if argument is substitutable using theta
 			while (theta.count(x[i]) > 0) x[i] = theta[x[i]];
 		}
 
 		return x;
 	}
 
-	//Unifies argumentList x with argumentList y and creates a substitution list theta
+	// Unifies argumentList x with argumentList y and creates a substitution list theta
 	bool unify(argumentList& x, argumentList& y, unordered_map<string, string>& theta) {
 		if (x.size() != y.size())
 			return false;
@@ -835,19 +817,19 @@ private:
 		for (size_t i = 0; i < x.size(); i++) {
 			if (x[i] != y[i]) {
 				if (isVariable(x[i])) {
-					//If x[i] is a variable
+					// If x[i] is a variable
 					theta[x[i]] = y[i];
 					x = substitute(x, theta);
 					y = substitute(y, theta);
 				}
 				else if (isVariable(y[i])) {
-					//If y[i] is a variable
+					// If y[i] is a variable
 					theta[y[i]] = x[i];
 					x = substitute(x, theta);
 					y = substitute(y, theta);
 				}
 				else {
-					//If x[i] and y[i] both are constants
+					// If x[i] and y[i] both are constants
 					return false;
 				}
 			}
@@ -860,7 +842,7 @@ public:
 	Knowledgebase() = default;
 
 	void tell(const string_view fact) {
-		//Loop through all CNF sentences and insert into KB
+		// Loop through all CNF sentences and insert into KB
 		vector<sentence> sentences = CNF::convertToCNFSentences(fact);
 		for (size_t i = 0; i < sentences.size(); i++) {
 			DB.store(sentences[i]);
@@ -868,39 +850,39 @@ public:
 	}
 
 	bool ask(const string_view query) {
-		//Calculate finish time quota
+		// Calculate finish time quota
 		double finishTime = get_wall_time() + maxQueryTime;
-		//Convert query into CNF
+		// Convert query into CNF
 		sentence alpha = CNF::convertToCNFSentences(query)[0];
-		//Negate alpha
+		// Negate alpha
 		sentence notAlpha = CNF::negateCNFSentence(alpha);
-		//Clone the knowledge base's data
+		// Clone the knowledge base's data
 		Database KB(DB);
-		//Store alpha in KB (KB ^ ~alpha = unsatisfiable)
+		// Store alpha in KB (KB ^ ~alpha = unsatisfiable)
 		KB.store(notAlpha);
 
 		queue<sentence> Frontier;
-		unordered_set<sentence, hash_sentence> LoopDetector;    //Prevents duplicate sentences in KB
+		unordered_set<sentence, hash_sentence> LoopDetector;    // Prevents duplicate sentences in KB
 
 		Frontier.push(notAlpha);
 
 		while (!Frontier.empty()) {
-			//Choose nearest node from frontier
+			// Choose nearest node from frontier
 			sentence currentSentence = Frontier.front();
-			//Remove the node from frontier
+			// Remove the node from frontier
 			Frontier.pop();
 
 			for (size_t i = 0; i < currentSentence.size(); i++) {
 
-				//create a resolver predicate by negating the current predicate
+				// create a resolver predicate by negating the current predicate
 				predicate resolver = currentSentence[i].negate();
-				//Get resolvableSentences for each predicate in the currentSentence
+				// Get resolvableSentences for each predicate in the currentSentence
 				vector<pair<sentence, size_t>> resolvableSentences = KB.fetch(resolver);
 				for (size_t j = 0; j < resolvableSentences.size(); j++) {
-					//Resolve each sentence in the resolvableSentences
-					//Create substitution list
+					// Resolve each sentence in the resolvableSentences
+					// Create substitution list
 					unordered_map<string, string> theta;
-					//Find unifiable predicate in the sentence
+					// Find unifiable predicate in the sentence
 					if (resolvableSentences[j].first[resolvableSentences[j].second].name == currentSentence[i].name &&
 						resolvableSentences[j].first[resolvableSentences[j].second].negated !=
 						currentSentence[i].negated) {
@@ -909,7 +891,7 @@ public:
 						argumentList y = resolvableSentences[j].first[resolvableSentences[j].second].args;
 
 						if (unify(x, y, theta)) {
-							//If unifiable, use substitution list theta to unify all the predicates in both sentences
+							// If unifiable, use substitution list theta to unify all the predicates in both sentences
 							sentence t1 = currentSentence;
 							sentence t2 = resolvableSentences[j].first;
 							for (size_t k = 0; k < t1.size(); k++)
@@ -917,26 +899,26 @@ public:
 							for (size_t k = 0; k < t2.size(); k++)
 								t2[k].args = substitute(t2[k].args, theta);
 
-							//Remove the resolving predicates
+							// Remove the resolving predicates
 							t1.erase(t1.begin() + i);
 							t2.erase(t2.begin() + resolvableSentences[j].second);
 
-							//Merge the two resolved sentences to obtain the resolvent
+							// Merge the two resolved sentences to obtain the resolvent
 							sentence resolvent;
 							resolvent.insert(resolvent.end(), t1.begin(), t1.end());
 							resolvent.insert(resolvent.end(), t2.begin(), t2.end());
 
-							//Factorize the resolvent to remove duplicate predicates
+							// Factorize the resolvent to remove duplicate predicates
 							CNF::factorize(resolvent);
 
-							//If resolvent is empty then alpha is true
+							// If resolvent is empty then alpha is true
 							if (resolvent.empty()) {
 								DB.store(alpha);
 								return true;
 							}
 
 							if (LoopDetector.count(resolvent) == 0) {
-								//If resolvent hasn't been encountered before then add to Frontier and store in KB
+								// If resolvent hasn't been encountered before then add to Frontier and store in KB
 								KB.store(resolvent);
 								Frontier.push(resolvent);
 								LoopDetector.insert(resolvent);
@@ -944,7 +926,7 @@ public:
 						}
 					}
 				}
-				//Check the time limit
+				// Check the time limit
 				if (get_wall_time() > finishTime) {
 					return false;
 				}
