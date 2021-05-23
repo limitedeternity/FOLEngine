@@ -168,6 +168,7 @@ private:
 							variable_count++;
 							visited_variables[s[i].args[j]] = variable_count;
 						}
+
 						temp = temp * 31 + hash<int>()(visited_variables[s[i].args[j]]);
 					}
 					else {
@@ -199,10 +200,12 @@ private:
 	class CNF {
 	private:
 		struct node {
-			node* parent, * left, * right;
+			node* parent = nullptr;
+			node* left = nullptr;
+			node* right = nullptr;
 			string data;
 
-			node() : parent(nullptr), left(nullptr), right(nullptr), data("") {}
+			node() = default;
 		};
 
 		static bool isOperator(const string_view s) {
@@ -219,14 +222,14 @@ private:
 		}
 
 		static node* deepCopy(node* root) {
-			if (root == nullptr)
-				return nullptr;
+			if (root == nullptr) return nullptr;
 
 			node* temp = new node;
 			temp->data = root->data;
 			temp->left = deepCopy(root->left);
 			if (temp->left != nullptr)
 				temp->left->parent = temp;
+
 			temp->right = deepCopy(root->right);
 			if (temp->right != nullptr)
 				temp->right->parent = temp;
@@ -241,8 +244,11 @@ private:
 			if (root->data == "~")
 				return (root->data + " " + createExpressionString(root->left));
 			else
-				return (createExpressionString(root->left) + " " + root->data + " " +
-					createExpressionString(root->right));
+				return (
+				    createExpressionString(root->left) + " " +
+				    root->data + " " +
+					createExpressionString(root->right)
+				);
 		}
 
 		static node* createExpressionTree(const vector<string>& expression) {
@@ -292,8 +298,7 @@ private:
 		}
 
 		static void deleteExpressionTree(node* root) {
-			if (root == nullptr)
-				return;
+			if (root == nullptr) return;
 
 			deleteExpressionTree(root->left);
 			deleteExpressionTree(root->right);
@@ -380,8 +385,7 @@ private:
 		}
 
 		static node* negate(node* root) {
-			if (root == nullptr)
-				return nullptr;
+			if (root == nullptr) return nullptr;
 
 			if (root->left == nullptr && root->right == nullptr) {
 				// If leaf node is encountered i.e operand encountered
@@ -398,7 +402,7 @@ private:
 				// operator encountered
 				if (root->data == "~") {
 					// If a "~" operator node is encountered
-					node* t = root;
+					node* prev_root = root;
 					if (root->parent == nullptr) {
 						// if root doesnt have a parent then make child the root
 						root = root->left;
@@ -416,9 +420,10 @@ private:
 						// make the roots parent, the child's parent
 						root->left->parent = root->parent;
 						root = root->left;
-						// delete the "~" node
 					}
-					delete t;
+
+                    // delete the "~" node
+					delete prev_root;
 					return root;
 				}
 				else if (root->data == "&") {
@@ -449,8 +454,7 @@ private:
 		}
 
 		static node* resolveNegations(node* root) {
-			if (root == nullptr)
-				return nullptr;
+			if (root == nullptr) return nullptr;
 
 			while (root->data == "~") {
 				root = negate(root); // removes the "~" sign only
@@ -527,8 +531,7 @@ private:
 		}
 
 		static node* distributeOrOverAnd(node* root) {
-			if (root == nullptr)
-				return nullptr;
+			if (root == nullptr) return nullptr;
 
 			// If root is an operand, return without modification
 			if (!isOperator(root->data))
@@ -698,6 +701,11 @@ private:
 		vector<sentence> data;  // Contains all sentences
 		unordered_map<string, row> index; // Contains index about all sentences
 
+        /*
+         * For sentences like (∀𝑥𝑃(𝑥))∨(∃𝑥𝑄(𝑥)) which use the same variable name twice,
+         * change the name of one of the variables.
+         * This avoids confusion later when dropping quantifiers.
+        */
 		sentence standardizeVariables(sentence& s) {
 			unordered_set<char> current_variables;
 			// Iterate through all predicates of the sentence
@@ -862,8 +870,9 @@ public:
 		KB.store(notAlpha);
 
 		queue<sentence> Frontier;
-		unordered_set<sentence, hash_sentence> LoopDetector;    // Prevents duplicate sentences in KB
 
+        // Prevents duplicate sentences in KB
+		unordered_set<sentence, hash_sentence> LoopDetector;
 		Frontier.push(notAlpha);
 
 		while (!Frontier.empty()) {
@@ -937,14 +946,12 @@ public:
 	}
 };
 
-string_view ltrim(const string_view s)
-{
+string_view ltrim(const string_view s) {
 	size_t start = s.find_first_not_of(" \n\r\t\f\v");
 	return (start == string_view::npos) ? "" : s.substr(start);
 }
 
-string_view rtrim(const string_view s)
-{
+string_view rtrim(const string_view s) {
 	size_t end = s.find_last_not_of(" \n\r\t\f\v");
 	return (end == string_view::npos) ? "" : s.substr(0, end + 1);
 }
