@@ -1,4 +1,5 @@
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 double get_wall_time() {
 	LARGE_INTEGER time, freq;
