@@ -20,12 +20,12 @@
 
 Эти высказывания можно представить в логике первого порядка следующим образом:
 
-1. $mother(Liz,Charley)$
-2. $father(Charley,Billy)$
-3. $∀x,y(mother(x,y)→parent(x,y))$
-4. $∀x,y(father(x,y)→parent(x,y))$
-5. $∀x,y(parent(x,y)→ancestor(x,y))$
-6. $∀x,y,z((parent(x,y)∧ancestor(y,z))→ancestor(x,z))$
+1. `Mother(Liz,Charley)`
+2. `Father(Charley,Billy)`
+3. `∀x,y (Mother(x,y) → Parent(x,y))`
+4. `∀x,y (Father(x,y) → Parent(x,y))`
+5. `∀x,y (Parent(x,y) → Ancestor(x,y))`
+6. `∀x,y,z ((Parent(x,y) ∧ Ancestor(y,z)) → Ancestor(x,z))`
 
 Затем из выражений удаляются кванторы, после чего первые можно передавать программе:
 
@@ -55,26 +55,27 @@ Ancestor(Liz,Bob) :: NO
 
 ### Тестовый пример 2
 
-Выясним, убило ли что-нибудь Туну.
-
 ```
 !- Cat(x) => Animal(x)
 !- Dog(x) => Animal(x)
 !- Cat(Tuna)
 !- Dog(D)
 !- Owns(Jack,D)
+!- Kills(Jade,Tuna)
 !- Animal(y) & Owns(x,y) => AnimalLover(x)
+!- Animal(y) & Owns(x,y) => HasOwner(y)
 !- ~(AnimalLover(x) & Animal(y) & Kills(x,y))
-!- Kills(Jack, Tuna) | Kills(Curiosity, Tuna)
 
-# Did someone kill Tuna?
-?- Kills(x, Tuna)
+# Комментарий 
+?- AnimalLover(Jade)
+?- HasOwner(D) 
 ```
 
 Ответ:
 
 ```
 Y:\FOLEngine\Debug>FOLEngine.exe ..\test2.txt
-Kills(x, Tuna) :: YES
+AnimalLover(Jade) :: NO
+HasOwner(D) :: YES
 ```
 

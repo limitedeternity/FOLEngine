@@ -3,9 +3,11 @@
 !- Cat(Tuna)
 !- Dog(D)
 !- Owns(Jack,D)
+!- Kills(Jade,Tuna)
 !- Animal(y) & Owns(x,y) => AnimalLover(x)
+!- Animal(y) & Owns(x,y) => HasOwner(y)
 !- ~(AnimalLover(x) & Animal(y) & Kills(x,y))
-!- Kills(Jack, Tuna) | Kills(Curiosity, Tuna)
 
-# Did someone kill Tuna?
-?- Kills(x, Tuna)
+# Комментарий 
+?- AnimalLover(Jade)
+?- HasOwner(D) 
