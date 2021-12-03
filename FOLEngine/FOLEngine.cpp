@@ -969,7 +969,7 @@ string_view trim(const string_view s) {
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         cout << "Usage: " << argv[0] << " <in_file>" << endl;
-        return 0;
+        return 1;
     }
 
     size_t NQ = 0, NS = 0;
@@ -977,7 +977,7 @@ int main(int argc, char* argv[]) {
     vector<string> query;
 
     std::ifstream infile(argv[1]);
-    std::string line;
+    string line;
     if (infile.is_open()) {
         while (std::getline(infile, line)) {
             if (line.compare(0, 2, "?-") == 0) {
@@ -997,6 +997,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         cout << "Failed to load " << argv[1] << endl;
+        return 1;
     }
 
     for (size_t i = 0; i < NQ; ++i) {
